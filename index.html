@@ -4,68 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogo da Forca Python</title>
-    <!-- Tailwind CSS para um design moderno e responsivo -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white min-h-screen flex flex-col items-center justify-between p-4">
+<body class="bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white min-h-screen flex flex-col items-center justify-between p-4 relative">
 
-    <!-- Cabeçalho -->
-    <header class="w-full max-w-md text-center py-4">
-        <span class="bg-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-500/30">Versão Web</span>
-        <h1 class="text-3xl font-bold mt-2 tracking-tight">Jogo da Forca</h1>
-        <p class="text-slate-400 text-sm">Adivinhe a palavra secreta em Python</p>
+    <!-- Painel de Configurações (Jogador 1) no Canto Superior Direito -->
+    <div class="absolute top-4 right-4 z-50">
+        <button id="toggle-config" onclick="toggleConfigMenu()" class="bg-blue-900/80 hover:bg-blue-800 text-blue-200 border border-blue-500/40 p-2.5 rounded-xl shadow-lg backdrop-blur-md flex items-center gap-2 transition-all active:scale-95">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span class="text-xs font-semibold hidden sm:inline">Jogador 1</span>
+        </button>
+
+        <!-- Menu Desdobrável (Jogador 1) -->
+        <div id="config-menu" class="hidden absolute right-0 mt-2 w-72 bg-slate-900/95 border border-blue-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl transition-all">
+            <h3 class="text-sm font-bold text-blue-400 mb-3 flex items-center justify-between">
+                <span>Painel do Jogador 1</span>
+                <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full uppercase">Configurar</span>
+            </h3>
+
+            <div class="space-y-3">
+                <!-- Definição da Palavra -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Palavra Secreta:</label>
+                    <div class="relative">
+                        <input type="password" id="custom-word" placeholder="Ex: python" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500 pr-9">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-2.5 top-2 text-slate-400 hover:text-blue-400">
+                            <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Definição de Chances -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Número de Chances:</label>
+                    <input type="number" id="custom-chances" min="1" max="10" value="4" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+
+                <!-- Botão Salvar -->
+                <button onclick="applyCustomSettings()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg text-xs transition-all shadow-md active:scale-95 mt-1">
+                    Iniciar Jogo para Jogador 2
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabeçalho Principal -->
+    <header class="w-full max-w-md text-center py-4 mt-8 sm:mt-0">
+        <span class="bg-blue-500/20 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-500/30">Jogador 2 na vez</span>
+        <h1 class="text-3xl font-bold mt-2 tracking-tight text-white">Jogo da Forca</h1>
+        <p class="text-slate-400 text-sm">Adivinhe a palavra secreta</p>
     </header>
 
-    <!-- Conteúdo Principal -->
-    <main class="w-full max-w-md bg-slate-800/60 backdrop-blur-md rounded-2xl p-6 border border-slate-700 shadow-2xl flex flex-col items-center">
+    <!-- Conteúdo Principal do Jogo -->
+    <main class="w-full max-w-md bg-slate-900/60 backdrop-blur-md rounded-2xl p-6 border border-blue-900/50 shadow-2xl flex flex-col items-center">
         
-        <!-- Desenho da Forca (SVG) -->
+        <!-- Desenho da Forca (SVG Azul) -->
         <div class="my-4 h-36 flex items-center justify-center">
-            <svg height="120" width="120" viewBox="0 0 100 100" class="stroke-indigo-400 fill-none stroke-[3] rounded-lg">
-                <!-- Base da forca -->
-                <line x1="10" y1="90" x2="90" y2="90" class="stroke-slate-600 stroke-[4]" />
-                <line x1="30" y1="90" x2="30" y2="10" class="stroke-slate-600 stroke-[4]" />
-                <line x1="30" y1="10" x2="70" y2="10" class="stroke-slate-600 stroke-[4]" />
-                <line x1="70" y1="10" x2="70" y2="25" class="stroke-slate-600 stroke-[4]" />
+            <svg height="120" width="120" viewBox="0 0 100 100" class="stroke-blue-400 fill-none stroke-[3] rounded-lg">
+                <!-- Estrutura Principal -->
+                <line x1="10" y1="90" x2="90" y2="90" class="stroke-slate-700 stroke-[4]" />
+                <line x1="30" y1="90" x2="30" y2="10" class="stroke-slate-700 stroke-[4]" />
+                <line x1="30" y1="10" x2="70" y2="10" class="stroke-slate-700 stroke-[4]" />
+                <line x1="70" y1="10" x2="70" y2="25" class="stroke-slate-700 stroke-[4]" />
 
-                <!-- Partes do boneco (aparecem conforme as chances diminuem de 4 para 0) -->
-                <!-- 3 chances restantes: Cabeça -->
-                <circle id="part-3" cx="70" cy="35" r="10" class="transition-all duration-300 opacity-0" />
-                <!-- 2 chances restantes: Tronco -->
-                <line id="part-2" x1="70" y1="45" x2="70" y2="70" class="transition-all duration-300 opacity-0" />
-                <!-- 1 chance restante: Braços -->
-                <line id="part-1" x1="70" y1="55" x2="55" y2="65" class="transition-all duration-300 opacity-0" />
-                <line id="part-1-b" x1="70" y1="55" x2="85" y2="65" class="transition-all duration-300 opacity-0" />
-                <!-- 0 chances: Pernas (Game Over) -->
-                <line id="part-0" x1="70" y1="70" x2="55" y2="85" class="transition-all duration-300 opacity-0" />
-                <line id="part-0-b" x1="70" y1="70" x2="85" y2="85" class="transition-all duration-300 opacity-0" />
+                <!-- Partes do Boneco Dinâmicas -->
+                <circle id="part-head" cx="70" cy="35" r="10" class="transition-all duration-300 opacity-0 stroke-blue-400" />
+                <line id="part-body" x1="70" y1="45" x2="70" y2="70" class="transition-all duration-300 opacity-0 stroke-blue-400" />
+                <line id="part-arm-l" x1="70" y1="55" x2="55" y2="65" class="transition-all duration-300 opacity-0 stroke-blue-400" />
+                <line id="part-arm-r" x1="70" y1="55" x2="85" y2="65" class="transition-all duration-300 opacity-0 stroke-blue-400" />
+                <line id="part-leg-l" x1="70" y1="70" x2="55" y2="85" class="transition-all duration-300 opacity-0 stroke-blue-400" />
+                <line id="part-leg-r" x1="70" y1="70" x2="85" y2="85" class="transition-all duration-300 opacity-0 stroke-blue-400" />
             </svg>
         </div>
 
-        <!-- Palavra Secreta (Letras ou Tracinhos) -->
-        <div id="word-container" class="flex gap-2.5 my-6 text-3xl font-bold tracking-widest min-h-[3rem] items-center justify-center">
-            <!-- Gerado via JavaScript -->
+        <!-- Conteiner da Palavra -->
+        <div id="word-container" class="flex flex-wrap gap-2.5 my-6 text-3xl font-bold tracking-widest min-h-[3rem] items-center justify-center max-w-full">
+            <!-- Gerado dinamicamente via Javascript -->
         </div>
 
-        <!-- Status de Chances -->
-        <div class="mb-6 flex items-center gap-2 bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700/50">
+        <!-- Indicador de Tentativas -->
+        <div class="mb-6 flex items-center gap-2 bg-slate-950/70 px-4 py-2 rounded-xl border border-blue-900/40">
             <span class="text-slate-400 text-sm">Chances restantes:</span>
-            <span id="chances-count" class="text-indigo-400 font-bold text-lg">4</span>
+            <span id="chances-count" class="text-blue-400 font-bold text-lg">4</span>
         </div>
 
-        <!-- Teclado Virtual para Celular -->
-        <div id="keyboard" class="grid grid-cols-7 gap-2 w-full">
-            <!-- Gerado via JS -->
+        <!-- Teclado Virtual (Grid Responsiva) -->
+        <div id="keyboard" class="grid grid-cols-7 gap-1.5 sm:gap-2 w-full">
+            <!-- Gerado via Javascript -->
         </div>
 
-        <!-- Mensagem de Vitória / Derrota (Modal Embutido) -->
+        <!-- Caixa de Resultado (Vitória / Derrota) -->
         <div id="message-box" class="hidden mt-6 w-full text-center p-4 rounded-xl border transition-all">
             <p id="message-text" class="font-bold text-lg mb-3"></p>
-            <button onclick="resetGame()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
+            <button onclick="resetGame()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-95">
                 Jogar Novamente
             </button>
         </div>
@@ -74,21 +116,53 @@
 
     <!-- Rodapé -->
     <footer class="text-slate-500 text-xs py-4 text-center">
-        Criado para rodar no navegador do celular 🚀
+        Desenvolvido para jogar em Celulares e Computadores 🚀
     </footer>
 
-    <!-- Lógica do Jogo -->
     <script>
-        const palavra = "python";
-        let letrasUsuario = [];
+        // Configurações e Estado Inicial
+        let palavra = "python";
+        let maxChances = 4;
         let chances = 4;
+        let letrasUsuario = [];
         let gameOver = false;
 
         const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
 
-        function initGame() {
+        function toggleConfigMenu() {
+            const menu = document.getElementById('config-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('custom-word');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function applyCustomSettings() {
+            const newWord = document.getElementById('custom-word').value.trim().toLowerCase();
+            const newChances = parseInt(document.getElementById('custom-chances').value);
+
+            if (newWord.length === 0) {
+                alert("Por favor, digite uma palavra válida!");
+                return;
+            }
+
+            if (isNaN(newChances) || newChances < 1) {
+                alert("Digite um número de chances válido (mínimo 1)!");
+                return;
+            }
+
+            palavra = newWord;
+            maxChances = newChances;
+            document.getElementById('custom-word').value = "";
+            toggleConfigMenu();
+            resetGame();
+        }
+
+        function resetGame() {
             letrasUsuario = [];
-            chances = 4;
+            chances = maxChances;
             gameOver = false;
             document.getElementById('message-box').classList.add('hidden');
             document.getElementById('keyboard').classList.remove('pointer-events-none', 'opacity-50');
@@ -97,15 +171,20 @@
         }
 
         function renderGame() {
-            // Renderizar a palavra
-            let wordContainer = document.getElementById('word-container');
+            // Renderizar a Palavra
+            const wordContainer = document.getElementById('word-container');
             wordContainer.innerHTML = "";
             let ganhou = true;
 
             for (let letra of palavra) {
                 let span = document.createElement('span');
-                span.className = "border-b-4 border-indigo-500 pb-1 w-8 text-center uppercase";
-                if (letrasUsuario.includes(letra.toLowerCase())) {
+                span.className = "border-b-4 border-blue-500 pb-1 min-w-[2rem] text-center uppercase";
+                
+                // Trata espaços caso o jogador 1 digite frases ou palavras compostas
+                if (letra === " ") {
+                    span.textContent = " ";
+                    span.className = "min-w-[1rem]";
+                } else if (letrasUsuario.includes(letra.toLowerCase())) {
                     span.textContent = letra;
                 } else {
                     span.textContent = "_";
@@ -114,53 +193,59 @@
                 wordContainer.appendChild(span);
             }
 
-            // Atualizar contador de chances
+            // Atualizar Contador de Chances
             document.getElementById('chances-count').textContent = chances;
 
-            // Atualizar desenho da forca baseado nas chances (4 down to 0)
-            for (let i = 0; i <= 3; i++) {
-                let part = document.getElementById(`part-${i}`);
-                if (part) {
-                    if (chances <= i) {
-                        part.classList.remove('opacity-0');
-                    } else {
-                        part.classList.add('opacity-0');
-                    }
-                }
-                // Partes duplas (braços e pernas)
-                let partB = document.getElementById(`part-${i}-b`);
-                if (partB) {
-                    if (chances <= i) {
-                        partB.classList.remove('opacity-0');
-                    } else {
-                        partB.classList.add('opacity-0');
-                    }
-                }
-            }
+            // Atualizar Animação do Desenho da Forca com base nas chances restantes
+            updateHangmanDrawing();
 
-            // Verificar fim de jogo
+            // Verificar Condições de Fim de Jogo
             if (ganhou) {
                 endGame(true);
-            } else if (chances === 0) {
+            } else if (chances <= 0) {
                 endGame(false);
             }
         }
 
+        function updateHangmanDrawing() {
+            const parts = [
+                document.getElementById('part-head'),
+                document.getElementById('part-body'),
+                document.getElementById('part-arm-l'),
+                document.getElementById('part-arm-r'),
+                document.getElementById('part-leg-l'),
+                document.getElementById('part-leg-r')
+            ];
+
+            // Esconde todas as partes primeiro
+            parts.forEach(part => part && part.classList.add('opacity-0'));
+
+            // Calcula proporcionalmente quantas partes exibir de acordo com os erros
+            const erros = maxChances - chances;
+            const totalPartes = parts.length;
+            
+            for (let i = 0; i < totalPartes; i++) {
+                if (erros > 0 && i < Math.ceil((erros / maxChances) * totalPartes)) {
+                    if (parts[i]) parts[i].classList.remove('opacity-0');
+                }
+            }
+        }
+
         function renderKeyboard() {
-            let keyboard = document.getElementById('keyboard');
+            const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = "";
 
             alphabet.forEach(letra => {
                 let btn = document.createElement('button');
                 btn.textContent = letra.toUpperCase();
-                btn.className = "bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 rounded-lg text-sm uppercase transition-all shadow active:scale-95 disabled:opacity-30 disabled:pointer-events-none";
+                btn.className = "bg-slate-800 hover:bg-slate-700 text-blue-200 font-semibold py-2 rounded-lg text-sm uppercase transition-all shadow active:scale-95 disabled:pointer-events-none border border-slate-700/50";
                 
                 if (letrasUsuario.includes(letra)) {
                     btn.disabled = true;
-                    if (palavra.includes(letra)) {
-                        btn.classList.add('!bg-emerald-600');
+                    if (palavra.toLowerCase().includes(letra)) {
+                        btn.className = "bg-emerald-600/80 text-white font-semibold py-2 rounded-lg text-sm uppercase border border-emerald-500 opacity-90";
                     } else {
-                        btn.classList.add('!bg-rose-600');
+                        btn.className = "bg-rose-900/60 text-slate-400 font-semibold py-2 rounded-lg text-sm uppercase border border-rose-800/40 opacity-40";
                     }
                 }
 
@@ -186,21 +271,33 @@
             gameOver = true;
             document.getElementById('keyboard').classList.add('pointer-events-none', 'opacity-50');
             
-            let msgBox = document.getElementById('message-box');
-            let msgText = document.getElementById('message-text');
+            const msgBox = document.getElementById('message-box');
+            const msgText = document.getElementById('message-text');
             msgBox.classList.remove('hidden');
 
             if (venceu) {
-                msgBox.className = "mt-6 w-full text-center p-4 rounded-xl border bg-emerald-950/80 border-emerald-500/50 text-emerald-300 transition-all shadow-lg";
+                msgBox.className = "mt-6 w-full text-center p-4 rounded-xl border bg-emerald-950/80 border-emerald-500/50 text-emerald-300 transition-all shadow-lg backdrop-blur-sm";
                 msgText.textContent = `🎉 Parabéns, você ganhou! A palavra era: ${palavra.toUpperCase()}`;
             } else {
-                msgBox.className = "mt-6 w-full text-center p-4 rounded-xl border bg-rose-950/80 border-rose-500/50 text-rose-300 transition-all shadow-lg";
+                msgBox.className = "mt-6 w-full text-center p-4 rounded-xl border bg-rose-950/80 border-rose-500/50 text-rose-300 transition-all shadow-lg backdrop-blur-sm";
                 msgText.textContent = `❌ Você perdeu! A palavra era: ${palavra.toUpperCase()}`;
             }
         }
 
-        // Inicializar ao carregar
-        window.onload = initGame;
+        // Suporte para Teclado Físico
+        document.addEventListener('keydown', (e) => {
+            if (gameOver) return;
+            const inputConfig = document.getElementById('custom-word');
+            if (document.activeElement === inputConfig) return; // Não capturar enquanto o jogador 1 digita
+
+            const key = e.key.toLowerCase();
+            if (alphabet.includes(key)) {
+                handleGuess(key);
+            }
+        });
+
+        // Inicializar o jogo ao carregar a página
+        window.onload = resetGame;
     </script>
 </body>
 </html>
